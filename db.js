@@ -5,7 +5,7 @@ const mongodb = async () => {
   // const mongoURI =
   //   "mongodb://localhost:27017";
   const mongoURI =
-    "mongodb://127.0.0.1:27017/gofoodmern?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.1.1";
+    "mongodb://127.0.0.1:27017/gofoodmern?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.1.1" || "mongodb://0.0.0.0:27017/gofoodmern?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.1.1";
 
   try {
     await mongoose.connect(mongoURI, { useNewUrlParser: true });
