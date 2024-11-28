@@ -9,54 +9,12 @@ const axios = require("axios");
 const fetch = require("../middleware/fetchdetails");
 const jwtSecret = "HaHa";
 
-// router.post(
-//   "/createuser",
-//   [
-//     body("email").isEmail(),
-//     body("password").isLength({ min: 5 }),
-//     body("name").isLength({ min: 5}),
-//   ],
-//   async (req, res) => {
-//     let success = false;
-//     const errors = validationResult(req);
-//     if (!errors.isEmpty()) {
-//       return res.status(400).json({ success, errors: errors.array() });
-//     }
-
-//     const salt = await bcrypt.genSalt(10);
-//     let securePass = await bcrypt.hash(req.body.password, salt);
-//     try {
-//       await User.create({
-//         name: req.body.name,
-//         password: securePass,
-//         email: req.body.email,
-//         location: req.body.location,
-//       })
-//         .then((user) => {
-//           const data = {
-//             user: {
-//               id: user.id,
-//             },
-//           };
-//           const authToken = jwt.sign(data, jwtSecret);
-//           success = true;
-//           res.json({ success, authToken });
-//         })
-//         .catch((err) => {
-//           console.log(err);
-//           res.json({ error: "Please enter a unique value." });
-//         });
-//     } catch (error) {
-//       console.error(error.message);
-//     }
-//   }
-// );
 router.post(
   "/createuser",
   [
     body("email").isEmail(),
     body("password").isLength({ min: 5 }),
-    body("name").isLength({ min: 5 }),
+    body("name").isLength({ min: 5}),
   ],
   async (req, res) => {
     let success = false;
@@ -65,34 +23,31 @@ router.post(
       return res.status(400).json({ success, errors: errors.array() });
     }
 
+    const salt = await bcrypt.genSalt(10);
+    let securePass = await bcrypt.hash(req.body.password, salt);
     try {
-      const existingUser = await User.findOne({ email: req.body.email });
-      if (existingUser) {
-        return res.status(400).json({ success, error: "Email is already registered. Please use a different email." });
-      }
-
-      const salt = await bcrypt.genSalt(10);
-      let securePass = await bcrypt.hash(req.body.password, salt);
-
-      const user = await User.create({
+      await User.create({
         name: req.body.name,
         password: securePass,
         email: req.body.email,
         location: req.body.location,
-      });
-
-      const data = {
-        user: {
-          id: user.id,
-        },
-      };
-      const authToken = jwt.sign(data, jwtSecret);
-      success = true;
-      res.json({ success, authToken });
-
+      })
+        .then((user) => {
+          const data = {
+            user: {
+              id: user.id,
+            },
+          };
+          const authToken = jwt.sign(data, jwtSecret);
+          success = true;
+          res.json({ success, authToken });
+        })
+        .catch((err) => {
+          console.log(err);
+          res.json({ error: "Please enter a unique value." });
+        });
     } catch (error) {
       console.error(error.message);
-      res.status(500).json({ error: "Internal Server Error" });
     }
   }
 );
